@@ -1,6 +1,5 @@
-
 pipeline {
-    agent{node('master')}
+    agent { node('master') }
     stages {
         stage('Dowload project') {
             steps {
@@ -19,17 +18,15 @@ pipeline {
                 }
             }
         }
-        stage ('Create docker image'){
-            steps{
-                script{
+        stage('Create docker image') {
+            steps {
+                script {
                     sh "docker build ${WORKSPACE}/auto -t webapp"
                     sh "docker run -d webapp"
-                    sh "docker exec -it webapp "df -h > ~/proc""
+//                    sh "docker exec -it webapp "df -h > ~/proc""
                 }
             }
         }
 
     }
-
-
 }

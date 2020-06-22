@@ -1,7 +1,7 @@
 pipeline {
     agent { node('master') }
     stages {
-        stage('Dowload project') {
+        stage('Download project and clean working space') {
             steps {
                 script {
                     cleanWs()

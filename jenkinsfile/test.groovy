@@ -5,9 +5,21 @@ pipeline {
             steps {
                 script {
                     cleanWs()
+                    withCredentials([
+                            usernamePassword(credentialsId: 'srv_sudo',
+                                    usernameVariable: 'username',
+                                    passwordVariable: 'password')
+                    ]) {
+                        try {
+                            sh "echo '${password}' | sudo -S docker stop abritsheva"
+                            sh "echo '${password}' | sudo -S docker container rm abritsheva"
+                        } catch (Exception e) {
+                            print 'container not exist, skip clean'
+                        }
+                    }
                 }
                 script {
-                    echo 'Start download project'
+                    echo 'Update'
                     checkout([$class                           : 'GitSCM',
                               branches                         : [[name: '*/master']],
                               doGenerateSubmoduleConfigurations: false,
@@ -18,15 +30,36 @@ pipeline {
                 }
             }
         }
-        stage('Create docker image') {
+        stage('Build & run docker image') {
             steps {
                 script {
-                    sh "docker build ${WORKSPACE}/auto -t webapp"
-                    sh "docker run -d webapp"
-                    sh "docker exec -it webapp 'df -h > ~/proc'"
+                    withCredentials([
+                            usernamePassword(credentialsId: 'srv_sudo',
+                                    usernameVariable: 'username',
+                                    passwordVariable: 'password')
+                    ]) {
+
+                        sh "echo '${password}' | sudo -S docker build ${WORKSPACE}/auto -t abritsheva"
+                        sh "echo '${password}' | sudo -S docker run -d -p 8080:80 --name abritsheva -v /home/adminci/is_mount_dir:/stat abritsheva"
+                    }
                 }
             }
         }
+        stage('Get stats & write to file') {
+            steps {
+                script {
+                    withCredentials([
+                            usernamePassword(credentialsId: 'srv_sudo',
+                                    usernameVariable: 'username',
+                                    passwordVariable: 'password')
+                    ]) {
 
+                        sh "echo '${password}' | sudo -S docker exec -t isng bash -c 'df -h > /stat/stats.txt'"
+                        sh "echo '${password}' | sudo -S docker exec -t isng bash -c 'top -n 1 -b >> /stat/stats.txt'"
+                    }
+                }
+            }
+
+        }
     }
 }

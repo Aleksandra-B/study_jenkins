@@ -30,7 +30,7 @@ pipeline {
                 }
             }
         }
-        stage('Build & run docker image') {
+        stage('Run docker') {
             steps {
                 script {
                     withCredentials([
@@ -45,7 +45,7 @@ pipeline {
                 }
             }
         }
-        stage('Get stats & write to file') {
+        stage('Write info to file') {
             steps {
                 script {
                     withCredentials([

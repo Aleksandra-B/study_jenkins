@@ -40,7 +40,7 @@ pipeline {
                     ]) {
 
                         sh "echo '${password}' | sudo -S docker build ${WORKSPACE}/auto -t abritsheva"
-                        sh "echo '${password}' | sudo -S docker run -d -p 8080:80 --name abritsheva -v /home/adminci/is_mount_dir:/stat abritsheva"
+                        sh "echo '${password}' | sudo -S docker run -d -p 8142:80 --name abritsheva -v /home/adminci/is_mount_dir:/stat abritsheva"
                     }
                 }
             }

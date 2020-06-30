@@ -13,9 +13,13 @@ pipeline {
                         try {
                             sh "echo '${password}' | sudo -S docker stop abritsheva"
                             sh "echo '${password}' | sudo -S docker container rm abritsheva"
+                            currentBuild.result = 'SUCCESS'
                         } catch (Exception e) {
                             print 'container not exist, skip clean'
+                            currentBuild.result = 'FAILURE'
+
                         }
+                        echo "RESULT: ${currentBuild.result}"
                     }
                 }
                 script {
@@ -60,6 +64,20 @@ pipeline {
                 }
             }
 
+        }
+        stage('Stop docker container') {
+            steps {
+                script {
+                    withCredentials([
+                            usernamePassword(credentialsId: 'srv_sudo',
+                                    usernameVariable: 'username',
+                                    passwordVariable: 'password')
+                    ]) {
+
+                        sh "echo '${password}' | sudo -S docker stop abritsheva"
+                    }
+                }
+            }
         }
     }
 }
